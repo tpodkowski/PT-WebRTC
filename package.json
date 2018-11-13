@@ -2,9 +2,10 @@
   "name": "video-p2p",
   "version": "1.0.0",
   "description": "P2P Video Communicator ",
-  "main": "index.js",
+  "main": "build/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel app/js -d build"
   },
   "repository": {
     "type": "git",
@@ -24,6 +25,14 @@
   },
   "homepage": "https://github.com/tpodkowski/video-p2p#readme",
   "dependencies": {
+    "babel-preset-stage-3": "^6.24.1",
     "peerjs": "^0.3.18"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.1.5",
+    "babel-cli": "^6.26.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-env": "^1.7.0"
   }
 }
