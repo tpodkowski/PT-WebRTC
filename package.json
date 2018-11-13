@@ -26,6 +26,7 @@
   "homepage": "https://github.com/tpodkowski/video-p2p#readme",
   "dependencies": {
     "babel-preset-stage-3": "^6.24.1",
+    "editorconfig": "^0.15.2",
     "peerjs": "^0.3.18"
   },
   "devDependencies": {
