@@ -22,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/tpodkowski/video-p2p/issues"
   },
-  "homepage": "https://github.com/tpodkowski/video-p2p#readme"
+  "homepage": "https://github.com/tpodkowski/video-p2p#readme",
+  "dependencies": {
+    "peerjs": "^0.3.18"
+  }
 }
