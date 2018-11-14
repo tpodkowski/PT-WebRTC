@@ -26,6 +26,7 @@
   "homepage": "https://github.com/tpodkowski/video-p2p#readme",
   "dependencies": {
     "editorconfig": "^0.15.2",
+    "npx": "^10.2.0",
     "peerjs": "^0.3.18",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
