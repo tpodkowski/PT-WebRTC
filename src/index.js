@@ -6,43 +6,106 @@ import Video from './js/Video';
 class App extends Component {
   constructor(props) {
     super(props);
-    this.videoRef = React.createRef();
+
+    this.streamRef = null;
+    this.localRef = React.createRef();
+    this.remoteRef = React.createRef();
     this.receiver = this.receiver.bind(this);
-    this.sender = this.sender.bind(this);
+
+    this.startChat = this.startChat.bind(this);
+    this.stopChat = this.stopChat.bind(this);
+
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   }
+
+  startChat() {
+    // sender
+    const peer = new Peer('sender', { host: 'localhost', port: 9000, path: '/' });
+    const conn = peer.connect('receiver');
+
+    conn.on('open', () => {
+      conn.send('hi!')
+    });
+
+    navigator.getUserMedia({
+      video: true,
+    }, (localStream) => {
+      this.streamRef = localStream;
+      this.localRef.current.srcObject = localStream;
+
+      const video = this.localRef.current;
+      video.srcObject = localStream;
+      video.onloadedmetadata = e => video.play();
+
+      const call = peer.call('receiver', localStream);
+
+      call.on('stream', (remoteStream) => {
+        this.remoteRef.current.srcObject = remoteStream;
+      });
+    }, error => console.error(error));
+  }
+
   receiver() {
     const peer = new Peer('sender', { host: 'localhost', port: 9000, path: '/' })
     const conn = peer.connect('receiver')
 
     conn.on('open', () => {
       conn.send('hi!')
-    });
-  }
-  sender() {
-    const peer = new Peer('receiver', { host: 'localhost', port: 9000, path: '/' })
-    peer.on('connection', (conn) => {
-      conn.on('data', (data) => {
-        console.log(data);
-      })
     })
+
+    peer.on('call', (call) => {
+      navigator.getUserMedia({
+        video: true,
+      }, (localStream) => {
+        this.streamRef = localStream;
+        this.localRef.current.srcObject = localStream;
+
+        call.answer(localStream);
+
+        call.on('stream', remoteStream => {
+          this.remoteRef.current.srcObject = remoteStream;
+        });
+      });
+    }, error => console.error(error));
   }
+
+  stopChat() {
+    this.streamRef.getTracks().map(val => val.stop());
+  }
+
   render() {
     return (
       <div>
-        <button
-          onClick={this.receiver}
-        >
-          Receiver
-        </button>
-        <button
-          onClick={this.sender}
-        >
-          Sender
-        </button>
-        {/* <Video
-          ref={this.videoRef}
-          onUserMediaError={error => console.error(error)}
-        /> */}
+        <div>
+          <button
+            onClick={this.startChat}
+            style={{backgroundColor: 'green', color: 'white'}}
+          >
+            sender
+          </button>
+          <button
+            onClick={this.receiver}
+            style={{backgroundColor: 'yellow'}}
+          >
+            receiver
+          </button>
+          <button
+            onClick={this.stopChat}
+            style={{backgroundColor: 'red', color: 'white'}}
+          >
+            Stop chat
+          </button>
+        </div>
+        <div>
+          <video
+            ref={this.localRef}
+            autoPlay
+          ></video>
+          <video
+            ref={this.remoteRef}
+            autoPlay
+          ></video>
+        </div>
       </div>
     );
   }
