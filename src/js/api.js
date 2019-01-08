@@ -1,7 +1,16 @@
+import openSocket from 'socket.io-client';
 
+const socket = openSocket('ws://localhost:3000');
 
-const subscribeMessage = (message, onSuccess) => {
-
+const getMessages = (onSuccess) => {
+  socket.on('chat:message', messages => onSuccess(messages));
 }
 
-export { subscribeMessage };
+const sendMessage = (message, onSuccess) => {
+  socket.emit('chat:message', message);
+}
+
+export {
+  getMessages,
+  sendMessage,
+};

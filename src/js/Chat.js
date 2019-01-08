@@ -1,11 +1,17 @@
 import React, { Component } from 'react';
-import openSocket from 'socket.io-client';
-
-// import {
-//   subscribeMessage
-// } from './api';
-
-const socket = openSocket('ws://localhost:3000');
+import {
+  Box,
+  Button,
+  Grommet,
+  Text,
+  TextArea,
+  InfiniteScroll,
+} from 'grommet';
+import { Send } from 'grommet-icons';
+import {
+  getMessages,
+  sendMessage,
+} from './api';
 
 class Chat extends Component {
   constructor(props) {
@@ -15,41 +21,57 @@ class Chat extends Component {
     this.state = {
       messages: [],
     }
-    this.sendMessage = this.sendMessage.bind(this);
+
+    this.submitMessage = this.submitMessage.bind(this);
   }
 
   componentDidMount() {
-    socket.on('chat message', messages => this.setState({ messages }));
+    getMessages(messages => this.setState({ messages }));
+    this.inputRef.current.focus();
   }
 
-  sendMessage() {
-    socket.emit('chat message', this.inputRef.current.value);
+  submitMessage() {
+    sendMessage(this.inputRef.current.value);
     this.inputRef.current.value = '';
   }
 
   render() {
     return (
-      <div>
-        <div>
-          {
-            this.state.messages.map((message, index) => {
-              const date = new Date(message.date);
-              return (
-                <div key={index}>
-                  <small>
-                    {`${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`}
-                  </small>
-                  <span> { message.message }</span>
-                </div>
-              )
-            })
-          }
-        </div>
-        <div>
-          <textarea type="text" name="message" ref={this.inputRef} />
-          <button onClick={this.sendMessage}>Send</button>
-        </div>
-      </div>
+      <Grommet className="chat">
+        <Box className="message" style={{ maxHeight: 450 }}>
+          <InfiniteScroll
+            items={this.state.messages}
+            step={5}
+            pad="medium"
+            replace={true}
+          >
+            {(item, index) => (
+              <Box
+                key={index}
+                pad='small'
+                direction="row"
+              >
+                <Text size='medium'>{item.message}</Text>
+                <Text size='medium' weight="bold">{item.date}</Text>
+              </Box>
+            )}
+          </InfiniteScroll>
+        </Box>
+        <Box direction="row" pad="medium" gap='medium' align='center'>
+          <TextArea
+            ref={this.inputRef}
+            type="text"
+            name="message"
+            placeholder="Message"
+          />
+          <Button
+            primary={true}
+            icon={<Send />}
+            label="Send"
+            onClick={this.submitMessage}
+          />
+        </Box>
+      </Grommet>
     );
   }
 }

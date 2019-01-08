@@ -14,14 +14,17 @@ class Video extends Component {
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   }
 
-  startChat() {
-    // sender
-    const peer = new Peer('sender', { host: 'localhost', port: 9000, path: '/' });
-    const conn = peer.connect('receiver');
+  componentDidMount() {
+    this.startChat();
+  }
 
-    conn.on('open', () => {
-      conn.send('hi!')
-    });
+  startChat() {
+    // const peer = new Peer('sender', { host: 'localhost', port: 9000, path: '/' });
+    // const conn = peer.connect('receiver');
+
+    // conn.on('open', () => {
+    //   conn.send('hi!')
+    // });
 
     navigator.getUserMedia({
       video: true,
@@ -33,11 +36,11 @@ class Video extends Component {
       video.srcObject = localStream;
       video.onloadedmetadata = e => video.play();
 
-      const call = peer.call('receiver', localStream);
+      // const call = peer.call('receiver', localStream);
 
-      call.on('stream', (remoteStream) => {
-        this.remoteRef.current.srcObject = remoteStream;
-      });
+      // call.on('stream', (remoteStream) => {
+      //   this.remoteRef.current.srcObject = remoteStream;
+      // });
     }, error => console.error(error));
   }
 
@@ -72,7 +75,7 @@ class Video extends Component {
   render() {
     return (
       <div>
-        <div>
+        {/* <div>
           <button
             onClick={this.startChat}
             style={{backgroundColor: 'green', color: 'white'}}
@@ -91,7 +94,7 @@ class Video extends Component {
           >
             Stop chat
           </button>
-        </div>
+        </div> */}
         <div>
           <video
             ref={this.localRef}
