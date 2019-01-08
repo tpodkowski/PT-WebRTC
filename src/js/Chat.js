@@ -11,6 +11,8 @@ import { Send } from 'grommet-icons';
 import {
   getMessages,
   sendMessage,
+  getWriter,
+  sendWriter,
 } from './api';
 
 class Chat extends Component {
@@ -20,19 +22,30 @@ class Chat extends Component {
 
     this.state = {
       messages: [],
+      writer: '',
     }
 
     this.submitMessage = this.submitMessage.bind(this);
+    this.onStartWriting = this.onStartWriting.bind(this);
+    this.onStopWriting = this.onStopWriting.bind(this);
   }
 
   componentDidMount() {
     getMessages(messages => this.setState({ messages }));
-    this.inputRef.current.focus();
+    getWriter(writer => console.log({ writer}) || this.setState({ writer }));
   }
 
   submitMessage() {
     sendMessage(this.inputRef.current.value);
     this.inputRef.current.value = '';
+  }
+
+  onStartWriting() {
+    sendWriter(this.props.userName)
+  }
+
+  onStopWriting() {
+    sendWriter('')
   }
 
   render() {
@@ -62,7 +75,9 @@ class Chat extends Component {
             ref={this.inputRef}
             type="text"
             name="message"
-            placeholder="Message"
+            onFocus={this.onStartWriting}
+            onBlur={this.onStopWriting}
+            placeholder={this.state.writer ? `${this.state.writer} is typing...` : 'Your message'}
           />
           <Button
             primary={true}

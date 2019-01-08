@@ -2,15 +2,18 @@ import openSocket from 'socket.io-client';
 
 const socket = openSocket('ws://localhost:3000');
 
-const getMessages = (onSuccess) => {
+export const getMessages = (onSuccess) => {
   socket.on('chat:message', messages => onSuccess(messages));
 }
 
-const sendMessage = (message, onSuccess) => {
+export const sendMessage = (message) => {
   socket.emit('chat:message', message);
 }
 
-export {
-  getMessages,
-  sendMessage,
-};
+export const getWriter = (onSuccess) => {
+  socket.on('chat:typing', writer => onSuccess(writer));
+}
+
+export const sendWriter = (writer) => {
+  socket.emit('chat:typing', writer);
+}
