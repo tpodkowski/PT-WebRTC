@@ -1,0 +1,27 @@
+{
+  "name": "PT-WebRTC",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "run:server": "nodemon --exec babel-node server/server.js",
+    "run:client": "cd ./client/ && yarn run build",
+    "start": "yarn run run:client && yarn run run:server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/node": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "nodemon": "^1.18.9"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^6.2.0",
+    "express": "^4.16.4",
+    "twilio": "^3.27.1",
+    "twilio-video": "^1.15.0"
+  }
+}
