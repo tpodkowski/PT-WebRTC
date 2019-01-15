@@ -17,3 +17,33 @@ export const getWriter = (onSuccess) => {
 export const sendWriter = (writer) => {
   socket.emit('chat:typing', writer);
 }
+
+export const emitJoinRoom = (room) => {
+  if (room !== "") {
+    socket.emit('room:join', room);
+  }
+}
+
+socket.on('room:full', (room) => {
+  alert('Message from client: Room ' + room + ' is full :^(');
+});
+
+export const onRoomJoined = (onSuccess) => {
+  socket.on('room:joined', (data) => {
+    const { isInitiator } = data;
+    console.log(`Joined isInitiator: ${isInitiator}`, data);
+    onSuccess(data);
+  });
+}
+
+export const videoStream = (videoStream) => {
+  socket.emit('video:stream', videoStream);
+}
+
+socket.on('video:stream', (videoStream) => {
+  console.log({ videoStream });
+})
+
+socket.on('room:ready', () => {
+  console.log('Room ready');
+});

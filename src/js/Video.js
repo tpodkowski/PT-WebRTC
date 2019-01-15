@@ -1,111 +1,148 @@
 import React, { Component } from 'react';
+import {
+  emitJoinRoom,
+  onRoomJoined,
+  videoStream,
+} from './api';
+import {
+  Box,
+  Button,
+  Text,
+} from 'grommet';
+
+let remotePeerConnection = new RTCPeerConnection();
+let localPeerConnection = new RTCPeerConnection();
+
 class Video extends Component {
   constructor(props) {
     super(props);
 
-    this.streamRef = null;
     this.localRef = React.createRef();
     this.remoteRef = React.createRef();
-    this.receiver = this.receiver.bind(this);
 
-    this.startChat = this.startChat.bind(this);
-    this.stopChat = this.stopChat.bind(this);
+    this.callAction = this.callAction.bind(this);
+    this.createdAnswer = this.createdAnswer.bind(this);
+    this.createdOffer = this.createdOffer.bind(this);
+    this.getOtherPeer = this.getOtherPeer.bind(this);
+    this.handleConnection = this.handleConnection.bind(this);
+    this.startAction = this.startAction.bind(this);
+    this.hangupAction = this.hangupAction.bind(this);
+    this.onRoomJoined = this.onRoomJoined.bind(this);
 
     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
   }
 
   componentDidMount() {
-    this.startChat();
+    onRoomJoined(this.onRoomJoined);
   }
 
-  startChat() {
-    // const peer = new Peer('sender', { host: 'localhost', port: 9000, path: '/' });
-    // const conn = peer.connect('receiver');
-
-    // conn.on('open', () => {
-    //   conn.send('hi!')
-    // });
-
-    navigator.getUserMedia({
-      video: true,
-    }, (localStream) => {
-      this.streamRef = localStream;
-      this.localRef.current.srcObject = localStream;
-
-      const video = this.localRef.current;
-      video.srcObject = localStream;
-      video.onloadedmetadata = e => video.play();
-
-      // const call = peer.call('receiver', localStream);
-
-      // call.on('stream', (remoteStream) => {
-      //   this.remoteRef.current.srcObject = remoteStream;
-      // });
-    }, error => console.error(error));
+  startAction() {
+    emitJoinRoom(this.props.userName);
   }
 
-  receiver() {
-    // const peer = new Peer('sender', { host: 'localhost', port: 9000, path: '/' })
-    // const conn = peer.connect('receiver')
+  onRoomJoined(data) {
+    const {
+      isInitiator,
+      videoConstraints,
+    } = data;
 
-    // conn.on('open', () => {
-    //   conn.send('hi!')
-    // })
-
-    // peer.on('call', (call) => {
-    //   navigator.getUserMedia({
-    //     video: true,
-    //   }, (localStream) => {
-    //     this.streamRef = localStream;
-    //     this.localRef.current.srcObject = localStream;
-
-    //     call.answer(localStream);
-
-    //     call.on('stream', remoteStream => {
-    //       this.remoteRef.current.srcObject = remoteStream;
-    //     });
-    //   });
-    // }, error => console.error(error));
+    navigator.mediaDevices.getUserMedia(videoConstraints)
+      .then(((localStream) => {
+        this.localRef.current.srcObject = localStream;
+        videoStream({ isInitiator , localStream});
+        // if (!isInitiator) {
+          this.callAction({
+            isInitiator,
+            localStream
+          });
+        // }
+      }))
+      .catch(error => console.error(`[${error.name}] ${error.message}`));
   }
 
-  stopChat() {
-    this.streamRef.getTracks().map(val => val.stop());
+  callAction({ isInitiator, localStream }) {
+    localPeerConnection.addEventListener('icecandidate', this.handleConnection);
+    localPeerConnection.addEventListener('iceconnectionstatechange', () => {});
+
+    remotePeerConnection.addEventListener('icecandidate', this.handleConnection);
+    remotePeerConnection.addEventListener('iceconnectionstatechange', () => {});
+    remotePeerConnection.addEventListener('addstream', (event) => {
+      console.log({ event });
+      const remoteStream = event.stream;
+      this.remoteRef.current.srcObject = remoteStream;
+    });
+
+    localPeerConnection.addStream(localStream);
+
+    localPeerConnection.createOffer({
+      offerToReceiveVideo: 1,
+    }).then(this.createdOffer)
+      .catch(error => console.error(`[${error.name}] ${error.message}`));
+  }
+
+  createdOffer(description) {
+    localPeerConnection.setLocalDescription(description);
+    remotePeerConnection.setRemoteDescription(description);
+
+    remotePeerConnection.createAnswer()
+      .then(this.createdAnswer)
+      .catch(error => console.error(`[${error.name}] ${error.message}`));
+  }
+
+  createdAnswer(description) {
+    remotePeerConnection.setLocalDescription(description);
+    localPeerConnection.setRemoteDescription(description);
+  }
+
+  handleConnection({ target, candidate }) {
+    console.log('onConnectionHandle', { target, candidate});
+
+    if (candidate) {
+      const newIceCandidate = new RTCIceCandidate(candidate);
+      const otherPeer = this.getOtherPeer(target);
+
+      otherPeer.addIceCandidate(newIceCandidate);
+    }
+  }
+
+  getOtherPeer(peerConnection) {
+    return (peerConnection === localPeerConnection) ?
+      remotePeerConnection : localPeerConnection;
+  }
+
+  hangupAction() {
+    localPeerConnection.close();
+    remotePeerConnection.close();
+    localPeerConnection = null;
+    remotePeerConnection = null;
   }
 
   render() {
     return (
-      <div>
-        {/* <div>
-          <button
-            onClick={this.startChat}
-            style={{backgroundColor: 'green', color: 'white'}}
-          >
-            sender
-          </button>
-          <button
-            onClick={this.receiver}
-            style={{backgroundColor: 'yellow'}}
-          >
-            receiver
-          </button>
-          <button
-            onClick={this.stopChat}
-            style={{backgroundColor: 'red', color: 'white'}}
-          >
-            Stop chat
-          </button>
-        </div> */}
-        <div>
-          <video
-            ref={this.localRef}
-            autoPlay
-          ></video>
-          <video
-            ref={this.remoteRef}
-            autoPlay
-          ></video>
-        </div>
-      </div>
+      <Box>
+        <Box direction="row" gap="medium">
+          <Button id="startButton" label="Start" primary={true} onClick={this.startAction}/>
+          <Button id="hangupButton" label="Hang up" onClick={this.hangupAction}/>
+        </Box>
+        <Box direction="row" gap="medium" justify="center">
+          <Box>
+            <Text>Local</Text>
+            <video
+              ref={this.localRef}
+              autoPlay
+              playsInline
+            ></video>
+          </Box>
+          <Box>
+            <Text>Remote</Text>
+            <video
+              ref={this.remoteRef}
+              autoPlay
+              playsInline
+            ></video>
+          </Box>
+        </Box>
+      </Box>
     );
   }
 }

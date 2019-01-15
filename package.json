@@ -31,6 +31,7 @@
     "npx": "^10.2.0",
     "peerjs": "^0.3.18",
     "polished": "^2.3.1",
+    "pusher-js": "^4.3.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-jsx": "^1.0.0",

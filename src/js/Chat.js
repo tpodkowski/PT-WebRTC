@@ -32,7 +32,7 @@ class Chat extends Component {
 
   componentDidMount() {
     getMessages(messages => this.setState({ messages }));
-    getWriter(writer => console.log({ writer}) || this.setState({ writer }));
+    getWriter(writer => this.setState({ writer }));
   }
 
   submitMessage() {
