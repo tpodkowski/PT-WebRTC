@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "run:server": "nodemon --exec babel-node server/server.js",
-    "run:client": "cd ./client/ && yarn run build",
+    "run:client": "cd ./public/ && yarn run build",
     "start": "yarn run run:client && yarn run run:server"
   },
   "keywords": [],
