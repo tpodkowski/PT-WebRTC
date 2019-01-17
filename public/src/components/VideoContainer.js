@@ -1,23 +1,37 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Video from 'twilio-video';
+import {
+  AppBar,
+  Button,
+  Toolbar,
+  Drawer,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+} from '@material-ui/core';
+import Menu from '@material-ui/icons/Menu';
+
+const AVAILABLE_ROOMS = ['General', 'Room1', 'Room2'];
 
 class VideoContainer extends Component {
   constructor(props) {
     super(props);
     
     this.state = {
-      name: `Tomek${Math.floor(new Date() * Math.random())}`,
       activeRoom: null,
       previewTracks: null,
       identity: null,
+      isDrawerOpened: false,
+      selectedRoomIndex: null,
     };
 
     this.leaveRoomIfJoined = this.leaveRoomIfJoined.bind(this);
     this.roomJoined = this.roomJoined.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
+    this.toggleDrawer = this.toggleDrawer.bind(this);
     
-    this.selectRoomRef = React.createRef();
     this.remoteRef = React.createRef();
     this.localRef = React.createRef(); 
   }
@@ -68,12 +82,12 @@ class VideoContainer extends Component {
       console.log(`Joining: ${participant.identity}`);
     });
 
-    room.on('trackAdded', (track, participant) => {
+    room.on('trackSubscribed', (track, participant) => {
       const previewContainer = this.remoteRef.current;
       this.attachTracks([track], previewContainer);
     });
 
-    room.on('trackRemoved', (track, participant) => {
+    room.on('trackUnsubscribed', (track, participant) => {
       this.detachTracks([track]);
     });
 
@@ -116,9 +130,9 @@ class VideoContainer extends Component {
   };
 
   log(message) {
-    const logDiv = document.getElementById('log');
-    logDiv.innerHTML += '<p>&gt;&nbsp;' + message + '</p>';
-    logDiv.scrollTop = logDiv.scrollHeight;
+    // const logDiv = document.getElementById('log');
+    // logDiv.innerHTML += '<p>&gt;&nbsp;' + message + '</p>';
+    // logDiv.scrollTop = logDiv.scrollHeight;
   }
 
   leaveRoomIfJoined() {
@@ -133,11 +147,12 @@ class VideoContainer extends Component {
 
   joinRoom() {
     const {
-      name,
       previewTracks,
+      selectedRoomIndex,
     } = this.state;
+    const { name } = this.props;
     
-    const roomName = this.selectRoomRef.current.value;
+    const roomName = AVAILABLE_ROOMS[selectedRoomIndex];
         
     if (!roomName) {
       alert('Please enter a room name.');
@@ -156,28 +171,68 @@ class VideoContainer extends Component {
         
         Video
           .connect(token, connectOptions)
-          .then(this.roomJoined);
+          .then(this.roomJoined)
+          .catch(error => console.error(error));
       });
   }
 
+  toggleDrawer(open) {
+    this.setState({ isDrawerOpened: open });
+  }
+
   render() {
+    const { name } = this.props;
+    const { activeRoom } = this.state;
+    
+    const containerClassNames =`
+      preview
+      ${!name ? 'preview--inactive' : ''}
+      ${activeRoom ? 'preview--in-call' : ''}
+    `;
     return (
-      <div id="controls">
-        <div id="room-controls">
-          <p className="instructions">Room Name:</p>
-          <select ref={this.selectRoomRef} placeholder="Select a room">
-            <option value="general">General</option>
-          </select>
-          <button id="button-join"  onClick={this.joinRoom}>Join Room</button>
-          <button id="button-leave" onClick={this.leaveRoomIfJoined}>Leave Room</button>
+      <div className="video">
+        { name && (
+          <AppBar position="absolute">
+            <Toolbar>
+              <IconButton component="span" onClick={() => this.toggleDrawer(true)}>
+                <Menu />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
+        )}
+
+        <div className={containerClassNames}>
+          <div className="video-container video-container--local" ref={this.localRef}></div>
+          <div className="video-container video-container--remote" ref={this.remoteRef}></div>
         </div>
 
-        <div className="preview">
-          <div className="video-container" ref={this.localRef}></div>
-          <div className="video-container" ref={this.remoteRef}></div>
-        </div>
-        
-        <div id="log"></div>
+        <Drawer
+          anchor="right"
+          open={this.state.isDrawerOpened}
+          onClose={() => this.toggleDrawer(false)}
+        >
+          <div>
+            <p className="instructions">Room Name:</p>
+            <List component="nav">
+              {AVAILABLE_ROOMS.map((room, index) => (
+                <ListItem
+                  button
+                  key={index}
+                  selected={this.state.selectedRoomIndex === index}
+                  onClick={() => this.setState({ selectedRoomIndex: index })}
+                  >
+                  <ListItemText primary={room} />
+                </ListItem>
+              ))}
+            </List>
+            <Button
+              color="primary"
+              onClick={this.joinRoom}
+              disabled={this.state.selectedRoomIndex === null}
+            >Join Room</Button>
+            <Button color="secondary" onClick={this.leaveRoomIfJoined}>Leave Room</Button>
+          </div>
+        </Drawer>
       </div>
     );
   }

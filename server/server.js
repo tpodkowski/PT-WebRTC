@@ -14,7 +14,7 @@ const express = require('express');
 const app = express();
 
 app.use(cors());
-app.use('/', express.static(path.join(__dirname, '../client/build')));
+app.use('/', express.static(path.join(__dirname, '../public/build')));
 
 app.get('/token', (request, response) => {
   const identity = request.query.identity || 'Joe';
@@ -41,8 +41,8 @@ const httpsOptions = {
   cert: fs.readFileSync('./.ssl/server.cert')
 }
 
-const server = http.createServer(app);
-// const server = https.createServer(httpsOptions, app);
+// const server = http.createServer(app);
+const server = https.createServer(httpsOptions, app);
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {

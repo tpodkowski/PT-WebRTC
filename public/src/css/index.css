@@ -6,14 +6,74 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+video { object-fit: cover }
+
+.app {
+  width: 100%;
+  height: 100%;
+}
+
+.video {
+  overflow: hidden;
 }
 
 .preview {
-  display: flex;
-  flex-direction: row;
+  position: relative;
+  overflow: hidden;
 }
 
-.video-container {
-  background: #3b3b3b;
-  border: 1px solid #fafafa;
+.preview video {
+  width: 100%;
+  height: auto;
+}
+
+.preview--inactive {
+  filter: blur(5px) grayscale(100%);
+  transform: scale(1.1);
+}
+
+.video-container--local video {
+  min-width: 100%;
+  width: auto;
+  transform: translateY(-25%);
+}
+
+/* .video-container--remote {
+  display: none;
+} */
+
+.preview--in-call {
+  position: initial;
+}
+
+.preview--in-call .video-container--local {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  margin: 24px;
+  z-index: 1;
+}
+
+.preview--in-call .video-container--local video {
+  width: 320px;
+  min-height: auto;
+  transform: none;
+  box-shadow: 0 0 15px #3b3b3b;
+}
+
+.preview--in-call .video-container--remote {
+  display: block;
+}
+
+.preview--in-call .video-container--remote video {
+  min-width: 100%;
+  width: auto;
+  transform: translateY(-25%);
+}
+
+video {
+  object-fit: fill;
 }
