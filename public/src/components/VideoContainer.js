@@ -136,12 +136,15 @@ class VideoContainer extends Component {
       activeRoom,
     } = this.state;
 
-    if (activeRoom) {
-      activeRoom.disconnect();
-    }
-    
-    this.cameraPreview();
-    this.toggleDrawer(false);
+    this.setState({
+      selectedRoomIndex: null,
+    }, () => {
+      this.cameraPreview();
+      this.toggleDrawer(false);
+      if (activeRoom) {
+        activeRoom.disconnect();
+      }
+    });
   }
 
   joinRoom() {
