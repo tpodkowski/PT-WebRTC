@@ -24,6 +24,23 @@ video { object-fit: cover }
   background-color: transparent !important;
   box-shadow: none !important;
   align-items: flex-end;
+  margin-top: 24px;
+}
+
+.sidebar {
+  padding: 24px;
+  min-width: 25vw;
+}
+
+.sidebar__header {
+  display: 'flex';
+  align-items: 'center';
+  padding: '0 8px';
+  justify-content: 'flex-start';
+}
+
+.sidebar__channel-list {
+  margin: 0 -24px;
 }
 
 .preview--inactive .video-container--local {

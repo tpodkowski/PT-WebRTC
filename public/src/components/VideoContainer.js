@@ -12,6 +12,8 @@ import {
   ListItemText,
 } from '@material-ui/core';
 import Menu from '@material-ui/icons/Menu';
+import PhoneInTalk from '@material-ui/icons/PhoneInTalk';
+import Cancel from '@material-ui/icons/Cancel';
 
 const AVAILABLE_ROOMS = ['General', 'Room1', 'Room2'];
 
@@ -129,12 +131,6 @@ class VideoContainer extends Component {
     }, error => console.error('Unable to access local media', error));
   };
 
-  log(message) {
-    // const logDiv = document.getElementById('log');
-    // logDiv.innerHTML += '<p>&gt;&nbsp;' + message + '</p>';
-    // logDiv.scrollTop = logDiv.scrollHeight;
-  }
-
   leaveRoomIfJoined() {
     const {
       activeRoom,
@@ -163,7 +159,6 @@ class VideoContainer extends Component {
 
     const connectOptions = {
       name: roomName,
-      logLevel: 'debug',
       ...previewTracks && { tracks: previewTracks },
     };
 
@@ -193,7 +188,7 @@ class VideoContainer extends Component {
     `;
     return (
       <div className="video">
-        { name && (
+        {name && (
           <AppBar position="absolute" className="navbar" >
             <Toolbar>
               <Fab
@@ -216,26 +211,45 @@ class VideoContainer extends Component {
           open={this.state.isDrawerOpened}
           onClose={() => this.toggleDrawer(false)}
         >
-          <div>
-            <p className="instructions">Room Name:</p>
+          <div className="sidebar"> 
+            <p className="sidebar__header">Room Name:</p>
             <List component="nav">
-              {AVAILABLE_ROOMS.map((room, index) => (
-                <ListItem
-                  button
-                  key={index}
-                  selected={this.state.selectedRoomIndex === index}
-                  onClick={() => this.setState({ selectedRoomIndex: index })}
-                  >
-                  <ListItemText primary={room} />
-                </ListItem>
-              ))}
+              <div className="sidebar__channel-list">
+                {AVAILABLE_ROOMS.map((room, index) => (
+                  <ListItem
+                    button
+                    key={index}
+                    selected={this.state.selectedRoomIndex === index}
+                    onClick={() => this.setState({ selectedRoomIndex: index })}
+                    >
+                    <ListItemText primary={room} />
+                  </ListItem>
+                ))}
+              </div>
             </List>
             <Button
+              fullWidth
+              size="large"
+              variant="contained"
               color="primary"
               onClick={this.joinRoom}
               disabled={this.state.selectedRoomIndex === null}
-            >Join Room</Button>
-            <Button color="secondary" onClick={this.leaveRoomIfJoined}>Leave Room</Button>
+            >
+              <PhoneInTalk />
+              Join Room
+            </Button>
+            {activeRoom && (
+              <Button
+                fullWidth
+                size="large"
+                variant="contained"
+                color="secondary"
+                onClick={this.leaveRoomIfJoined}
+              >
+                <Cancel />
+                Leave Room
+              </Button>
+            )}
           </div>
         </Drawer>
       </div>
