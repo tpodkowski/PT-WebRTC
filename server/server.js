@@ -41,8 +41,8 @@ const httpsOptions = {
   cert: fs.readFileSync('./.ssl/server.cert')
 }
 
-// const server = http.createServer(app);
-const server = https.createServer(httpsOptions, app);
+const server = http.createServer(app);
+// const server = https.createServer(httpsOptions, app);
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
