@@ -6,7 +6,7 @@ import {
   Button,
   Toolbar,
   Drawer,
-  IconButton,
+  Fab,
   List,
   ListItem,
   ListItemText,
@@ -153,7 +153,9 @@ class VideoContainer extends Component {
     const { name } = this.props;
     
     const roomName = AVAILABLE_ROOMS[selectedRoomIndex];
-        
+    
+    this.toggleDrawer(false);
+
     if (!roomName) {
       alert('Please enter a room name.');
       return;
@@ -168,7 +170,7 @@ class VideoContainer extends Component {
     axios.get(`/token?identity=${name}`)
       .then(({ data }) => {
         const { token } = data;
-        
+
         Video
           .connect(token, connectOptions)
           .then(this.roomJoined)
@@ -192,11 +194,14 @@ class VideoContainer extends Component {
     return (
       <div className="video">
         { name && (
-          <AppBar position="absolute">
+          <AppBar position="absolute" className="navbar" >
             <Toolbar>
-              <IconButton component="span" onClick={() => this.toggleDrawer(true)}>
+              <Fab
+                color="default"
+                onClick={() => this.toggleDrawer(true)}
+              >
                 <Menu />
-              </IconButton>
+              </Fab>
             </Toolbar>
           </AppBar>
         )}
