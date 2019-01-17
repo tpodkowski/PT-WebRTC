@@ -14,7 +14,7 @@ const express = require('express');
 const app = express();
 
 app.use(cors());
-app.use('/', express.static(path.join(__dirname, '../public/build')));
+app.use(express.static(path.join(__dirname, '../public/build')));
 
 app.get('/token', (request, response) => {
   const identity = request.query.identity || 'Joe';
