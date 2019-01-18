@@ -16,7 +16,10 @@ Basic audio-video comunicator example. ReactJS app is placed inside `public` fol
 * Yarn - strongly recommended for running app
 
 ## Installation
-1. Create your own self-signed SSL certificate and place it in `.ssl` folder. NodeJS for HTTPS connection require `server.cert` and `server.key`. While using MacOS ensure that you've added your generated certs to your keychain.
+1. Create your own self-signed SSL certificate and place it in `.ssl` folder. NodeJS for HTTPS connection require `server.cert` and `server.key`. While using MacOS ensure that you've added your generated certs to your keychain. You can use the following instruction:
+```
+ openssl req -nodes -new -x509 -keyout server.key -out server.cert
+```
 2. Copy `.env.template` file and rename it to `.env`. Replace values with the ones received from your [Twilio account](https://www.twilio.com/docs/iam/access-tokens).
 3. Make sure you've installed all the packages both for server and client apps. To do this run `yarn install` in `/` and `/public` directories.
 4. For local URL sharing HTTPS is required, so ensure that in `server.js` you've commented out line
