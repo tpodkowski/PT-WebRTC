@@ -10,11 +10,37 @@ const cors = require('cors');
 const AccessToken = require('twilio').jwt.AccessToken;
 const VideoGrant = AccessToken.VideoGrant;
 const express = require('express');
+const socketIo = require('socket.io');
 
 const app = express();
 
+// const server = http.createServer(app);
+const server = https.createServer({
+  key: fs.readFileSync('./.ssl/server.key'),
+  cert: fs.readFileSync('./.ssl/server.cert')
+}, app);
+
+var io = socketIo.listen(server);
+let rooms = ['Public'];
+
 app.use(cors());
 app.use(express.static(path.join(__dirname, '../public/build')));
+
+io.on('connection', (socket) => {
+  socket.emit('rooms:changed', rooms)
+
+  socket.on('rooms:changed', (room) => {
+    if (Number.isInteger(room)) {
+      rooms.splice(room, 1);
+    }
+
+    if (typeof room === 'string') {
+      rooms.push(room);
+    }
+
+    io.emit('rooms:changed', rooms)
+  });
+});
 
 app.get('/token', (request, response) => {
   const identity = request.query.identity || 'Joe';
@@ -36,13 +62,6 @@ app.get('/token', (request, response) => {
   });
 });
 
-const httpsOptions = {
-  key: fs.readFileSync('./.ssl/server.key'),
-  cert: fs.readFileSync('./.ssl/server.cert')
-}
-
-const server = http.createServer(app);
-// const server = https.createServer(httpsOptions, app);
 const port = process.env.PORT || 3000;
 
 server.listen(port, () => {

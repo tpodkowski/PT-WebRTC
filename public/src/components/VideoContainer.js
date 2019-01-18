@@ -10,12 +10,13 @@ import {
   List,
   ListItem,
   ListItemText,
+  IconButton,
 } from '@material-ui/core';
 import Menu from '@material-ui/icons/Menu';
 import PhoneInTalk from '@material-ui/icons/PhoneInTalk';
 import Cancel from '@material-ui/icons/Cancel';
-
-const AVAILABLE_ROOMS = ['General', 'Room1', 'Room2'];
+import VideoCall from '@material-ui/icons/VideoCall';
+import Delete from '@material-ui/icons/Delete';
 
 class VideoContainer extends Component {
   constructor(props) {
@@ -152,9 +153,12 @@ class VideoContainer extends Component {
       previewTracks,
       selectedRoomIndex,
     } = this.state;
-    const { name } = this.props;
+    const {
+      name,
+      rooms
+    } = this.props;
     
-    const roomName = AVAILABLE_ROOMS[selectedRoomIndex];
+    const roomName = rooms[selectedRoomIndex];
     
     this.toggleDrawer(false);
 
@@ -184,7 +188,12 @@ class VideoContainer extends Component {
   }
 
   render() {
-    const { name } = this.props;
+    const {
+      name,
+      rooms,
+      addRoom,
+      deleteRoom,
+    } = this.props;
     const { activeRoom } = this.state;
     
     const containerClassNames =`
@@ -221,17 +230,30 @@ class VideoContainer extends Component {
             <p className="sidebar__header">Room Name:</p>
             <List component="nav">
               <div className="sidebar__channel-list">
-                {AVAILABLE_ROOMS.map((room, index) => (
+                {rooms.map((room, index) => (
                   <ListItem
                     button
                     key={index}
                     selected={this.state.selectedRoomIndex === index}
                     onClick={() => this.setState({ selectedRoomIndex: index })}
-                    >
+                  >
                     <ListItemText primary={room} />
+                    <IconButton onClick={() => deleteRoom(index)}>
+                      <Delete/>
+                    </IconButton>
                   </ListItem>
                 ))}
               </div>
+              <Button
+                fullWidth
+                size="large"
+                variant="contained"
+                color="primary"
+                onClick={() => addRoom(`Room${Math.round(Math.random() * 100000)}`)}
+              >
+                <VideoCall />
+                Add Room
+              </Button>
             </List>
             <Button
               fullWidth

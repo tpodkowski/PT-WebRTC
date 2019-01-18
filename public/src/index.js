@@ -6,6 +6,7 @@ import LoginDialog from './components/LoginDialog';
 import {
   Snackbar,
 } from '@material-ui/core';
+import openSocket from 'socket.io-client';
 
 class App extends Component {
   constructor(props) {
@@ -17,14 +18,23 @@ class App extends Component {
       showNotification: false,
       notificationMessage: '',
     }
+
+    this.socket = openSocket('wss://192.168.1.64:3000');
+
     this.handleAddName = this.handleAddName.bind(this);
     this.showNotification = this.showNotification.bind(this);
+    this.handleAddRoom = this.handleAddRoom.bind(this);
+    this.handleDeletingRoom = this.handleDeletingRoom.bind(this);
+  }
+
+  componentDidMount() {
+    this.socket.on('rooms:changed', (rooms) => {
+      this.setState({ rooms });
+    });
   }
 
   handleAddName(name) {
-    this.setState({
-      name,
-    });
+    this.setState({ name });
 
     this.showNotification(`Hi there, ${name}!`);
   }
@@ -36,9 +46,18 @@ class App extends Component {
     })
   }
 
+  handleAddRoom(room) {
+    this.socket.emit('rooms:changed', room);
+  }
+  
+  handleDeletingRoom(roomIndex) {
+    this.socket.emit('rooms:changed', roomIndex);
+  }
+
   render() {
     const {
       name,
+      rooms,
       showNotification,
       notificationMessage,
     } = this.state;
@@ -51,7 +70,10 @@ class App extends Component {
 
         <VideoContainer
           name={name}
+          rooms={rooms}
           showNotification={this.showNotification}
+          addRoom={this.handleAddRoom}
+          deleteRoom={this.handleDeletingRoom}
         />
 
         <Snackbar
