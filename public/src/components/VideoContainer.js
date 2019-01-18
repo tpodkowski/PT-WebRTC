@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Video from 'twilio-video';
+import AddRoomDialog from './AddRoomDialog';
 import {
   AppBar,
   Button,
@@ -28,12 +29,14 @@ class VideoContainer extends Component {
       identity: null,
       isDrawerOpened: false,
       selectedRoomIndex: null,
+      isRoomDialogOpen: false,
     };
 
     this.leaveRoomIfJoined = this.leaveRoomIfJoined.bind(this);
     this.roomJoined = this.roomJoined.bind(this);
     this.joinRoom = this.joinRoom.bind(this);
     this.toggleDrawer = this.toggleDrawer.bind(this);
+    this.handleAddRoomName = this.handleAddRoomName.bind(this);
     
     this.remoteRef = React.createRef();
     this.localRef = React.createRef(); 
@@ -187,14 +190,22 @@ class VideoContainer extends Component {
     this.setState({ isDrawerOpened: open });
   }
 
+  handleAddRoomName(roomName) {
+    this.setState({
+      isRoomDialogOpen: false,
+    }, () => this.props.addRoom(roomName));
+  }
+
   render() {
     const {
       name,
       rooms,
-      addRoom,
       deleteRoom,
     } = this.props;
-    const { activeRoom } = this.state;
+    const {
+      activeRoom,
+      isRoomDialogOpen,
+    } = this.state;
     
     const containerClassNames =`
       preview
@@ -249,7 +260,7 @@ class VideoContainer extends Component {
                 size="large"
                 variant="contained"
                 color="primary"
-                onClick={() => addRoom(`Room${Math.round(Math.random() * 100000)}`)}
+                onClick={() => this.setState({ isRoomDialogOpen: true })}
               >
                 <VideoCall />
                 Add Room
@@ -280,6 +291,10 @@ class VideoContainer extends Component {
             )}
           </div>
         </Drawer>
+        <AddRoomDialog
+          isOpen={isRoomDialogOpen}
+          onSubmit={this.handleAddRoomName}
+        />
       </div>
     );
   }
