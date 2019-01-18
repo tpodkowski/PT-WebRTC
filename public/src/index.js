@@ -14,22 +14,33 @@ class App extends Component {
     this.state = {
       name: '',
       rooms: [],
-      welcomeSnackbarVisible: false,
+      showNotification: false,
+      notificationMessage: '',
     }
     this.handleAddName = this.handleAddName.bind(this);
+    this.showNotification = this.showNotification.bind(this);
   }
 
   handleAddName(name) {
     this.setState({
       name,
-      welcomeSnackbarVisible: true,
     });
+
+    this.showNotification(`Hi there, ${name}!`);
+  }
+
+  showNotification(notificationMessage) {
+    this.setState({
+      showNotification: true,
+      notificationMessage,
+    })
   }
 
   render() {
     const {
       name,
-      welcomeSnackbarVisible,
+      showNotification,
+      notificationMessage,
     } = this.state;
     return (
       <div className="app">
@@ -40,6 +51,7 @@ class App extends Component {
 
         <VideoContainer
           name={name}
+          showNotification={this.showNotification}
         />
 
         <Snackbar
@@ -47,10 +59,13 @@ class App extends Component {
             vertical: 'bottom',
             horizontal: 'right',
           }}
-          open={welcomeSnackbarVisible}
+          open={showNotification}
           autoHideDuration={3000}
-          message={`Hi there, ${name}!`}
-          onClose={() => this.setState({ welcomeSnackbarVisible: false })}
+          message={notificationMessage}
+          onClose={() => this.setState({
+            showNotification: false,
+            notificationMessage: '',
+          })}
         />
       </div>
     );

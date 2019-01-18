@@ -81,7 +81,7 @@ class VideoContainer extends Component {
     });
 
     room.on('participantConnected', (participant) => {
-      console.log(`Joining: ${participant.identity}`);
+      this.props.showNotification(`${participant.identity} joined the conversation`);
     });
 
     room.on('trackSubscribed', (track, participant) => {
