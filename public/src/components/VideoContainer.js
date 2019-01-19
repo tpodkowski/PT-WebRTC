@@ -161,17 +161,17 @@ class VideoContainer extends Component {
       rooms
     } = this.props;
     
-    const roomName = rooms[selectedRoomIndex];
+    const room = rooms[selectedRoomIndex];
     
     this.toggleDrawer(false);
 
-    if (!roomName) {
+    if (!room) {
       alert('Please enter a room name.');
       return;
     }
 
     const connectOptions = {
-      name: roomName,
+      name: room.name,
       ...previewTracks && { tracks: previewTracks },
     };
 
