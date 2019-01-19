@@ -35,3 +35,6 @@ const server = https.createServer({
 ```
 5. To build and launch the server simply run `yarn start` in the root directory.
 
+## Documentation
+Documentation is available [here](https://docs.google.com/document/d/13C67AgCg18MAILK_bBraaMTTAnzuMVC9eGt_-wgWYMQ/edit?usp=sharing).
+
