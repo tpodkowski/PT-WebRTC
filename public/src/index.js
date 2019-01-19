@@ -14,7 +14,10 @@ class App extends Component {
     
     this.state = {
       name: '',
-      rooms: [],
+      rooms: [{
+        name: 'Public',
+        isDeletable: false,
+      }],
       showNotification: false,
       notificationMessage: '',
     }
@@ -47,10 +50,26 @@ class App extends Component {
   }
 
   handleAddRoom(room) {
+    this.setState({
+      rooms: [
+        ...this.state.rooms,
+        room
+      ],
+    });
     this.socket.emit('rooms:changed', room);
   }
   
   handleDeletingRoom(roomIndex) {
+    const {
+      rooms,
+    } = this.state;
+
+    this.setState({
+      rooms: [
+        ...rooms.slice(0, roomIndex),
+        ...rooms.slice(roomIndex + 1, rooms.length),
+      ],
+    });
     this.socket.emit('rooms:changed', roomIndex);
   }
 

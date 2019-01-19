@@ -191,9 +191,14 @@ class VideoContainer extends Component {
   }
 
   handleAddRoomName(name) {
+    const room = {
+      name,
+      isDeletable: true,
+    };
+
     this.setState({
       isRoomDialogOpen: false,
-    }, () => this.props.addRoom({ name, isDeletable: true, }));
+    }, () => this.props.addRoom(room));
   }
 
   render() {
@@ -249,9 +254,11 @@ class VideoContainer extends Component {
                     onClick={() => this.setState({ selectedRoomIndex: index })}
                   >
                     <ListItemText primary={room.name} />
-                    <IconButton onClick={() => room.isDeletable &&deleteRoom(index)}>
-                      <Delete/>
-                    </IconButton>
+                    { room.isDeletable && (
+                      <IconButton onClick={() => deleteRoom(index)}>
+                        <Delete/>
+                      </IconButton>
+                    )}
                   </ListItem>
                 ))}
               </div>
