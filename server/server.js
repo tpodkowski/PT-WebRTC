@@ -14,16 +14,20 @@ const socketIo = require('socket.io');
 
 const app = express();
 
-// const server = http.createServer(app);
-const server = https.createServer({
-  key: fs.readFileSync('./.ssl/server.key'),
-  cert: fs.readFileSync('./.ssl/server.cert')
-}, app);
+const server = http.createServer(app);
+// const server = https.createServer({
+//   key: fs.readFileSync('./.ssl/server.key'),
+//   cert: fs.readFileSync('./.ssl/server.cert')
+// }, app);
 
 var io = socketIo.listen(server);
+
 let rooms = [{
   name: 'Public',
   isDeletable: false,
+}, {
+  name: 'Example room',
+  isDeletable: true,
 }];
 
 app.use(cors());
@@ -66,7 +70,8 @@ app.get('/token', (request, response) => {
 });
 
 const port = process.env.PORT || 3000;
+const host = process.env.YOUR_HOST || '0.0.0.0';
 
-server.listen(port, () => {
+server.listen(port, host, () => {
   console.log('Express server running on *:' + port);
 });
