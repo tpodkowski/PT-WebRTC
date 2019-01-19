@@ -21,7 +21,10 @@ const server = https.createServer({
 }, app);
 
 var io = socketIo.listen(server);
-let rooms = ['Public'];
+let rooms = [{
+  name: 'Public',
+  isDeletable: false,
+}];
 
 app.use(cors());
 app.use(express.static(path.join(__dirname, '../public/build')));
@@ -34,7 +37,7 @@ io.on('connection', (socket) => {
       rooms.splice(room, 1);
     }
 
-    if (typeof room === 'string') {
+    if (typeof room === 'object') {
       rooms.push(room);
     }
 

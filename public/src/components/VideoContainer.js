@@ -190,10 +190,10 @@ class VideoContainer extends Component {
     this.setState({ isDrawerOpened: open });
   }
 
-  handleAddRoomName(roomName) {
+  handleAddRoomName(name) {
     this.setState({
       isRoomDialogOpen: false,
-    }, () => this.props.addRoom(roomName));
+    }, () => this.props.addRoom({ name, isDeletable: true, }));
   }
 
   render() {
@@ -248,8 +248,8 @@ class VideoContainer extends Component {
                     selected={this.state.selectedRoomIndex === index}
                     onClick={() => this.setState({ selectedRoomIndex: index })}
                   >
-                    <ListItemText primary={room} />
-                    <IconButton onClick={() => deleteRoom(index)}>
+                    <ListItemText primary={room.name} />
+                    <IconButton onClick={() => room.isDeletable &&deleteRoom(index)}>
                       <Delete/>
                     </IconButton>
                   </ListItem>
